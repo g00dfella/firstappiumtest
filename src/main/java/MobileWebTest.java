@@ -1,4 +1,5 @@
 import io.appium.java_client.AppiumDriver;
+import io.appium.java_client.android.AndroidDriver;
 import io.appium.java_client.ios.IOSDriver;
 import io.appium.java_client.remote.MobileCapabilityType;
 import org.junit.Test;
@@ -7,35 +8,19 @@ import org.openqa.selenium.Keys;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
-
 import java.net.URL;
-
 import static org.junit.Assert.assertTrue;
+
+
 
 public class MobileWebTest {
 
     @Test
     public void testIncorrectFBLogin() throws Exception {
-        URL serverUrl = new URL("http://127.0.0.1:4723/wd/hub");
-
-        DesiredCapabilities capabilities = new DesiredCapabilities();
-
-        capabilities.setCapability(MobileCapabilityType.PLATFORM_NAME, "iOS");
-        capabilities.setCapability(MobileCapabilityType.PLATFORM_VERSION, "11.2");
-
-        capabilities.setCapability(MobileCapabilityType.DEVICE_NAME, "iPhone 7");
-        //capabilities.setCapability(MobileCapabilityType.UDID, "530593A1-84B3-42C9-A95A-4964D1D3FB");
-
-        capabilities.setCapability(MobileCapabilityType.BROWSER_NAME, "Safari");
-        capabilities.setCapability(MobileCapabilityType.FULL_RESET, "true");
-
-        capabilities.setCapability("showXcodeLog", "true");
-        // Be careful, if you have alerts to be displayed in the app future on, this setting should be false
-        capabilities.setCapability("autoAcceptAlerts", "true");
 
         System.out.println("Step 1. Create new driver");
-        AppiumDriver driver = new IOSDriver(serverUrl, capabilities);
-        WebDriverWait  wait = new WebDriverWait(driver, 30);
+        AppiumDriver driver = getAppiumDriver("iOS", new URL("http://127.0.0.1:4723/wd/hub"));
+        WebDriverWait wait = new WebDriverWait(driver, 30);
 
         System.out.println("Step 2. Open website");
         driver.get("https://facebook.com");
@@ -61,5 +46,42 @@ public class MobileWebTest {
 
     }
 
-}
 
+    private AppiumDriver getAppiumDriver(String platform, URL serverUrl) {
+        return platform.equals("iOS") ? getIOSDriver(serverUrl) : getAndroidDriver(serverUrl);
+    }
+
+
+    private AppiumDriver getIOSDriver(URL serverUrl) {
+        DesiredCapabilities capabilities = new DesiredCapabilities();
+        capabilities.setCapability(MobileCapabilityType.PLATFORM_NAME, "iOS");
+        capabilities.setCapability(MobileCapabilityType.PLATFORM_VERSION, "11.2");
+
+        capabilities.setCapability(MobileCapabilityType.DEVICE_NAME, "iPhone 7");
+        //capabilities.setCapability(MobileCapabilityType.UDID, "530593A1-84B3-42C9-A95A-4964D1D3FB");
+
+        capabilities.setCapability(MobileCapabilityType.BROWSER_NAME, "Safari");
+        capabilities.setCapability(MobileCapabilityType.FULL_RESET, "true");
+
+        capabilities.setCapability("showXcodeLog", "true");
+        // Be careful, if you have alerts to be displayed in the app future on, this setting should be false
+        capabilities.setCapability("autoAcceptAlerts", "true");
+
+        return new IOSDriver(serverUrl, capabilities);
+
+    }
+
+
+    private AppiumDriver getAndroidDriver(URL serverUrl) {
+        DesiredCapabilities capabilities = new DesiredCapabilities();
+
+        capabilities.setCapability(MobileCapabilityType.PLATFORM_NAME, "Android");
+        capabilities.setCapability(MobileCapabilityType.PLATFORM_VERSION, "5");
+
+        capabilities.setCapability(MobileCapabilityType.DEVICE_NAME, "Nexus 6");
+        capabilities.setCapability(MobileCapabilityType.BROWSER_NAME, "Browser");
+
+        return new AndroidDriver(serverUrl, capabilities);
+
+    }
+}
